@@ -4,9 +4,13 @@ This project exposes an MCP tool that searches for LinkedIn candidate profiles u
 
 ### Run
 
-```bash
+''' bash
+Program:
 uv run main.py
-```
+
+MCP Inspector:
+uv run mcp dev main.py
+'''
 
 Server:
 - `http://127.0.0.1:8000`

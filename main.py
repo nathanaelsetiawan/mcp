@@ -1,16 +1,12 @@
 import os
 from functools import lru_cache
 from typing import List, Optional
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from mcp.server.fastmcp import FastMCP
-from mcp.server.streamable_http import TransportSecuritySettings
 from exa_py import Exa
 from dotenv import load_dotenv
 import uvicorn
 from pydantic import BaseModel
-from starlette.requests import Request
-from starlette.responses import JSONResponse
-from starlette.routing import Route
 
 load_dotenv()
 
@@ -18,7 +14,7 @@ load_dotenv()
 app = FastAPI()
 mcp = FastMCP(app, "linkedin-mcp-server")
 
-app.mount("/", mcp.streamable_http_app())
+app.mount("/mcp", mcp.streamable_http_app())
 
 
 @lru_cache(maxsize=1)
@@ -55,10 +51,16 @@ def search_linkedin_candidates(query: str, num_results: int = 5) -> LinkedInSear
     if not query.strip():
         raise ValueError("`query` must not be empty.")
  
+    num_results = max(1, min(num_results, 10))
+
     include_domains = ["linkedin.com/in/"]
  
     try:
-        exa = get_exa()
+        try:
+            exa = get_exa()
+        except ValueError as e:
+            raise RuntimeError(f"Exa client not configured: {e}")
+
         response = exa.search(
             query,
             num_results=num_results,
@@ -88,14 +90,14 @@ def search_linkedin_candidates(query: str, num_results: int = 5) -> LinkedInSear
         )
  
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Exa search failed: {e}")
-        # raise ValueError(f"Exa search failed: {e}")
+        raise RuntimeError(f"Exa search failed: {e}")
 
 @app.get("/health")
 def health():
-    return "server bisa dijalankan"
+    return {"status": "ok", "message": "server bisa dijalankan"}
 
 # Entry point
 if __name__ == "__main__":
-    uvicorn.run(app, host="127.0.0.1", port=8000)
-    # mcp.run(transport="streamable-http")
+    host = os.getenv("HOST", "127.0.0.1")
+    port = os.getenv("PORT", "8000")
+    uvicorn.run(app, host=host, port=int(port))

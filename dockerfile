@@ -1,15 +1,24 @@
-# Gunakan image Python yang ringan
-FROM python:3.11-slim
+FROM python:3.13-slim
 
-# Tentukan direktori kerja
-WORKDIR /app
+# Pasang tool uv ke dalam container
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvbin/uv
+ENV PATH="/uvbin:$PATH"
 
-# Copy daftar library dan install
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
 
-# Copy seluruh kode FastAPI/MCP kamu
+WORKDIR /mcp-linkedin
+
+# Copy file dependensi (biar kalau ganti kode, install-nya tidak ulang)
+COPY pyproject.toml uv.lock ./
+
+# Install semua library (Basic uv sync)
+RUN uv sync --frozen --no-dev
+
+# Copy semua kodingan
 COPY . .
 
-# Jalankan server
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+EXPOSE 8000
+
+# Jalankan uvicorn lewat uv run agar otomatis masuk ke environment-nya
+CMD ["uv", "run", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
