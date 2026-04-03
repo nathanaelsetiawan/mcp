@@ -1,0 +1,13 @@
+[project]
+name = "mcp-linkedin"
+version = "0.1.0"
+description = "This website will build AI search agent that help HR to find the best candidate based on criteria"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "exa-py>=2.10.1",
+    "fastapi>=0.100",
+    "mcp[cli]>=1.26.0",
+    "pydantic>=2.0",
+    "uvicorn>=0.42.0",
+]
