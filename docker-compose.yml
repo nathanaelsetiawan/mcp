@@ -2,7 +2,7 @@ services:
   mcp-linkedin:
     build:
       context: .
-      dockerfile: dockerfile
+      dockerfile: Dockerfile
     ports:
       - "8000:8000"
     env_file:
