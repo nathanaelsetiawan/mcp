@@ -8,7 +8,7 @@ Program:
 uv run main.py
 
 MCP Inspector:
-uv run mcp dev main.py
+npx @modelcontextprotocol/inspector
 
 
 Server:

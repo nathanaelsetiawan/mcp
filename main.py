@@ -1,103 +1,87 @@
 import os
 from functools import lru_cache
 from typing import List, Optional
-from fastapi import FastAPI
-from mcp.server.fastmcp import FastMCP
-from exa_py import Exa
 from dotenv import load_dotenv
-import uvicorn
+from exa_py import Exa
+from mcp.server.fastmcp import FastMCP
 from pydantic import BaseModel
 
 load_dotenv()
 
-# App and plugin instatiation
-app = FastAPI()
-mcp = FastMCP(app, "linkedin-mcp-server")
-
-app.mount("/mcp", mcp.streamable_http_app())
+mcp = FastMCP("linkedin-mcp-server")
 
 
 @lru_cache(maxsize=1)
-def get_exa():
+def get_exa() -> Exa:
     api_key = os.getenv("EXA_API_KEY")
     if not api_key:
-        raise ValueError("EXA_API_KEY not found in environment")
+        raise ValueError("EXA_API_KEY not found in environment variables.")
     return Exa(api_key)
 
-# Model untuk tiap individu kandidat
+
+# Models
 class Candidate(BaseModel):
     title: str
     profile_url: str
     score: Optional[float] = None
     published_date: Optional[str] = None
 
-# Model untuk respon keseluruhan
+
 class LinkedInSearchResponse(BaseModel):
     query: str
     total_found: int
     candidates: List[Candidate]
 
-# Endpoint declarations
+
 @mcp.tool()
-def search_linkedin_candidates(query: str, num_results: int = 5) -> LinkedInSearchResponse:
+def search_linkedin_candidates(
+    query: str,
+    num_results: int = 5,
+) -> LinkedInSearchResponse:
     """
     Mencari profil kandidat potensial di LinkedIn menggunakan pencarian neural Exa.ai.
     Tool ini memahami konteks dan makna, bukan sekadar kata kunci.
- 
+
     Args:
-        query: Deskripsi kebutuhan kandidat.
+        query:       Deskripsi kebutuhan kandidat.
         num_results: Jumlah kandidat yang ingin ditampilkan (1-10).
     """
     if not query.strip():
         raise ValueError("`query` must not be empty.")
- 
+
     num_results = max(1, min(num_results, 10))
 
-    include_domains = ["linkedin.com/in/"]
- 
     try:
-        try:
-            exa = get_exa()
-        except ValueError as e:
-            raise RuntimeError(f"Exa client not configured: {e}")
+        exa = get_exa()
+    except ValueError as e:
+        raise RuntimeError(f"Exa client not configured: {e}") from e
 
+    try:
         response = exa.search(
             query,
             num_results=num_results,
-            include_domains=include_domains,
-            type="neural",   # AI mengambil konteks
-            contents=False,  # mengambil url dan judul, bukan data lengkap
+            include_domains=["linkedin.com/in/"],
+            type="neural",
+            contents=False,
         )
- 
-        results = response.results or []
-        candidates: List[Candidate] = []
-        for r in results:
-            url = getattr(r, "url", None)
-            if not url:
-                continue
-            candidates.append(
-                Candidate(
-                    title=getattr(r, "title", None) or str(url),
-                    profile_url=str(url),
-                    score=getattr(r, "score", None),
-                )
-            )
- 
-        return LinkedInSearchResponse(
-            query=query,
-            total_found=len(candidates),
-            candidates=candidates,
-        )
- 
     except Exception as e:
-        raise RuntimeError(f"Exa search failed: {e}")
+        raise RuntimeError(f"Exa search failed: {e}") from e
 
-@app.get("/health")
-def health():
-    return {"status": "ok", "message": "server bisa dijalankan"}
+    candidates: List[Candidate] = [
+        Candidate(
+            title=getattr(r, "title", None) or str(r.url),
+            profile_url=str(r.url),
+            score=getattr(r, "score", None),
+        )
+        for r in (response.results or [])
+        if getattr(r, "url", None)
+    ]
 
-# Entry point
+    return LinkedInSearchResponse(
+        query=query,
+        total_found=len(candidates),
+        candidates=candidates,
+    )
+
 if __name__ == "__main__":
-    host = os.getenv("HOST", "127.0.0.1")
-    port = os.getenv("PORT", "8000")
-    uvicorn.run(app, host=host, port=int(port))
+    mcp.run(transport="streamable-http")
