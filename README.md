@@ -5,10 +5,12 @@ This project exposes an MCP tool that searches for LinkedIn candidate profiles u
 ### Run
 
 Program:
-uv run main.py
+Lokal = uv run main.py
+Server = uv run python main.py
 
 MCP Inspector:
-npx @modelcontextprotocol/inspector
+Lokal = npx @modelcontextprotocol/inspector
+Server = npx @modelcontextprotocol/inspector python main.py
 
 
 Server:

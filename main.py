@@ -8,7 +8,7 @@ from pydantic import BaseModel
 
 load_dotenv()
 
-mcp = FastMCP("linkedin-mcp-server")
+mcp = FastMCP("linkedin-mcp-server", host="0.0.0.0")
 
 
 @lru_cache(maxsize=1)
@@ -84,4 +84,4 @@ def search_linkedin_candidates(
     )
 
 if __name__ == "__main__":
-    mcp.run(transport="streamable-http")
+    mcp.run(transport="sse")
