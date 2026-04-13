@@ -1,15 +1,14 @@
 import os
 from functools import lru_cache
-from typing import List, Optional
+from typing import List
 from dotenv import load_dotenv
 from exa_py import Exa
 from mcp.server.fastmcp import FastMCP
-from pydantic import BaseModel
+from models import Candidate, LinkedInSearchResponse
 
 load_dotenv()
 
 mcp = FastMCP("linkedin-mcp-server", host="0.0.0.0")
-
 
 @lru_cache(maxsize=1)
 def get_exa() -> Exa:
@@ -17,20 +16,6 @@ def get_exa() -> Exa:
     if not api_key:
         raise ValueError("EXA_API_KEY not found in environment variables.")
     return Exa(api_key)
-
-
-# Models
-class Candidate(BaseModel):
-    title: str
-    profile_url: str
-    score: Optional[float] = None
-    published_date: Optional[str] = None
-
-
-class LinkedInSearchResponse(BaseModel):
-    query: str
-    total_found: int
-    candidates: List[Candidate]
 
 
 @mcp.tool()
