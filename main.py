@@ -47,7 +47,6 @@ def search_linkedin_candidates(
     """
     must_have       = must_have or []
     nice_to_have    = nice_to_have or []
-    disqualifiers   = disqualifiers or []
 
     # Build query dari semua field
     parts = [f"{role} professional"]
