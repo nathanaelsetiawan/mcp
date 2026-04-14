@@ -42,7 +42,6 @@ def search_linkedin_candidates(
         region:           Lokasi kandidat, mis. 'Jakarta', 'Indonesia'.
         workplace:        Tipe lokasi kerja: 'on-site', 'hybrid', atau 'remote'.
         employee_status:  Status karyawan: 'full-time', 'contract', 'part-time', 'intern'.
-        disqualifiers:    Kata kunci pendiskualifikasi.
         num_results:      Jumlah kandidat yang diambil (1-10).
     """
     must_have       = must_have or []
@@ -101,7 +100,7 @@ def search_linkedin_candidates(
 
         # Scoring
         if must_have:
-            matched     = sum(1 for s in must_have if re.search(r"\b" + re.escape(s.lower()) + r"\b", blob))
+            matched = sum(1 for s in must_have if re.search(r"\b" + re.escape(s.lower()) + r"\b", blob))
             skill_score = matched / len(must_have)
         else:
             skill_score = 1.0
