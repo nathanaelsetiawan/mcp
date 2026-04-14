@@ -94,10 +94,6 @@ def search_linkedin_candidates(
         exa_score = getattr(r, "score", None) or 0.0
         blob      = f"{title} {snippet}".lower()
 
-        # Screening
-        if any(re.search(r"\b" + re.escape(kw.lower()) + r"\b", blob) for kw in disqualifiers):
-            continue
-
         # Scoring
         if must_have:
             matched = sum(1 for s in must_have if re.search(r"\b" + re.escape(s.lower()) + r"\b", blob))
