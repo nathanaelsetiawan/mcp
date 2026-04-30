@@ -7,7 +7,6 @@ class Candidate(BaseModel):
     score: Optional[float] = None
     published_date: Optional[str] = None
 
-
 class LinkedInSearchResponse(BaseModel):
     query: str
     total_found: int

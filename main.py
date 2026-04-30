@@ -6,7 +6,7 @@ from typing import List
 from dotenv import load_dotenv
 from exa_py import Exa
 from mcp.server.fastmcp import FastMCP
-from models import Candidate, LinkedInSearchResponse
+from models import LinkedInSearchResponse, Candidate
 
 load_dotenv()
 
