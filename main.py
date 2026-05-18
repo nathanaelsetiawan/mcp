@@ -27,8 +27,8 @@ def search_linkedin_candidates(
     must_have: Optional[List[str]] = None,
     nice_to_have: Optional[List[str]] = None,
     region: Optional[str] = None,
-    workplace: Optional[str] = None,      # "on-site" | "hybrid" | "remote"
-    employment_status: Optional[str] = None, # "full-time" | "contract" | "part-time" | "intern"
+    workplace: Optional[str] = None,            # "on-site" | "hybrid" | "remote"
+    employment_status: Optional[str] = None,    # "full-time" | "contract" | "part-time" | "intern"
     num_results: int = 1
 ) -> LinkedInSearchResponse:
     """
