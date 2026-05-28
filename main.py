@@ -10,7 +10,7 @@ from models import LinkedInSearchResponse, Candidate
 
 load_dotenv()
 
-mcp = FastMCP("linkedin-mcp-server", host="0.0.0.0")
+mcp = FastMCP("linkedin-mcp-server", host="0.0.0.0", port=5001)
 
 @lru_cache(maxsize=1)
 def get_exa() -> Exa:

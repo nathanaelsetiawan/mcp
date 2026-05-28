@@ -12,8 +12,8 @@ npx @modelcontextprotocol/inspector python main.py
 
 
 Server:
-- `http://127.0.0.1:8000`
-- MCP endpoint: `http://127.0.0.1:8000/mcp`
+- `http://0.0.0.0:5001`
+- MCP endpoint: `http://0.0.0.0:5001/sse`
 
 ### MCP Tool
 
