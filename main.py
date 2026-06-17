@@ -76,7 +76,8 @@ def search_linkedin_candidates(
         response = exa.search_and_contents(
             query,
             num_results=num_results,
-            include_domains=["linkedin.com/in/"],
+            include_domains=["linkedin.com"],
+            category="people",
             type="neural",
             text={"max_characters": 400, "include_html_tags": False},
         )
